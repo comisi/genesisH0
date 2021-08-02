@@ -47,7 +47,7 @@ def get_args():
   return options
 
 def get_algorithm(options):
-  supported_algorithms = ["SHA256", "scrypt", "X11", "X13", "X15"]
+  supported_algorithms = ["SHA256", "scrypt", "X11", "X13", "X15", "X16"]
   if options.algorithm in supported_algorithms:
     return options.algorithm
   else:
@@ -132,7 +132,7 @@ def generate_hash(data_block, algorithm, start_nonce, bits):
     sha256_hash, header_hash = generate_hashes_from_block(data_block, algorithm)
     last_updated             = calculate_hashrate(nonce, last_updated)
     if is_genesis_hash(header_hash, target):
-      if algorithm == "X11" or algorithm == "X13" or algorithm == "X15":
+      if algorithm == "X11" or algorithm == "X13" or algorithm == "X16" or algorithm == "X15":
         return (header_hash, nonce)
       return (sha256_hash, nonce)
     else:
@@ -165,6 +165,12 @@ def generate_hashes_from_block(data_block, algorithm):
     except ImportError:
       sys.exit("Cannot run X15 algorithm: module x15_hash not found")
     header_hash = x15_hash.getPoWHash(data_block)[::-1]
+  elif algorithm == 'X16':
+    try:
+      exec('import %s' % "x16r_hash")
+    except ImportError:
+      sys.exit("Cannot run X16 algorithm: module x16_hash not found")
+    header_hash = x16r_hash.getPoWHash(data_block)[::-1]
   return sha256_hash, header_hash
 
 
